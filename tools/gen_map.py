@@ -3,7 +3,7 @@ from PIL import Image
 CH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 def b64(p): return "data:image/png;base64,"+base64.b64encode(open(p,"rb").read()).decode()
 LB=b64("logo-black.png"); LW=b64("logo-white.png")
-OUT="map"
+OUT="map2"
 CSS="""*{margin:0;padding:0;box-sizing:border-box}
 body{background:#777;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#0A0A0A}
 .cv{position:relative;overflow:hidden;background:#FFFFFF}
@@ -21,20 +21,16 @@ def render(name,w,h,inner,scale=2):
     os.remove(p+".html")
 
 def cover(name,label,code,tick,title,sub,ts=96,logo_col=False):
-    col=(f'<img src="{LW}" style="width:104px">' if logo_col else f'<span style="font-size:{76 if len(code)<=2 else 60}px;font-weight:700;letter-spacing:-.04em;color:#FFFFFF;line-height:1">{code}</span>')
+    # v2: sem título (o Notion já mostra o nome da página). Tudo dentro da faixa central que o Notion exibe.
+    col=(f'<img src="{LW}" style="width:96px">' if logo_col else f'<span style="font-size:{72 if len(code)<=2 else 58}px;font-weight:700;letter-spacing:-.04em;color:#FFFFFF;line-height:1">{code}</span>')
     inner=f"""<div class=grid></div>
-<div class=bleed style="font-size:430px;left:-20px;bottom:-70px">EXPANSION</div>
-<div style="position:absolute;right:80px;top:0;bottom:0;width:150px;background:#D00001"></div>
-<div style="position:absolute;right:80px;top:150px;width:150px;height:300px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:22px 0">
+<div class=bleed style="font-size:330px;left:-14px;top:175px;opacity:.06">EXPANSION</div>
+<div style="position:absolute;right:80px;top:0;bottom:0;width:150px;background:#D00001;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
   <span style="font-size:11px;letter-spacing:.2em;color:#FFFFFF;font-weight:500">{label}</span>{col}
   <span style="font-size:11px;letter-spacing:.2em;color:#FFFFFF;font-weight:500">EXP©</span></div>
-<img src="{LB}" style="position:absolute;left:90px;top:160px;height:30px">
-<div class=meta style="position:absolute;right:270px;top:170px">© Expansion Co. 2026</div>
-<div style="position:absolute;left:90px;top:236px;right:300px">
-  <div class=tick>{tick}</div>
-  <div style="font-size:{ts}px;font-weight:700;letter-spacing:-.035em;text-transform:uppercase;line-height:.92;margin-top:14px">{title}</div>
-  {f'<div style="font-size:19px;color:#4A4741;margin-top:16px">{sub}</div>' if sub else ''}
-</div>"""
+<div style="position:absolute;left:90px;top:214px;display:flex;align-items:center;gap:16px">
+  <img src="{LB}" style="height:20px"><span style="width:28px;height:1px;background:rgba(10,10,10,.35)"></span><span class=tick style="font-size:13px">{tick}</span></div>
+<div class=meta style="position:absolute;right:262px;top:218px;font-size:11px">© Expansion Co. 2026</div>"""
     render(name,1500,600,inner)
 
 def icon(name,code,logo=False):
@@ -44,27 +40,27 @@ def icon(name,code,logo=False):
     render(name,280,280,f'<div style="position:absolute;inset:0;background:#0A0A0A"></div>{body}<div style="position:absolute;right:0;bottom:0;width:70px;height:70px;background:#D00001"></div>')
 
 def banner(name,n,title,tick):
-    inner=f"""<div class=grid></div>
-<div style="position:absolute;left:0;right:0;top:0;height:2px;background:#0A0A0A"></div>
-<div style="position:absolute;left:0;top:0;bottom:0;width:150px;background:#D00001;display:flex;align-items:center;justify-content:center"><span style="font-size:68px;font-weight:700;letter-spacing:-.04em;color:#FFFFFF">{n}</span></div>
-<div style="position:absolute;left:190px;top:50%;transform:translateY(-50%);font-size:68px;font-weight:700;letter-spacing:-.035em;text-transform:uppercase;line-height:1">{title}</div>
-<div class=meta style="position:absolute;right:50px;top:50%;transform:translateY(-50%);text-align:right;line-height:1.8">{tick}</div>
-<div style="position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(10,10,10,.2)"></div>"""
-    render(name,1500,200,inner)
+    # v2: faixa fina (1500x80) pra não dominar a página em largura total
+    inner=f"""<div style="position:absolute;left:0;right:0;top:0;height:2px;background:#0A0A0A"></div>
+<div style="position:absolute;left:0;top:0;bottom:0;width:88px;background:#D00001;display:flex;align-items:center;justify-content:center"><span style="font-size:34px;font-weight:700;letter-spacing:-.03em;color:#FFFFFF">{n}</span></div>
+<div style="position:absolute;left:116px;top:50%;transform:translateY(-50%);font-size:34px;font-weight:700;letter-spacing:-.02em;text-transform:uppercase;line-height:1">{title}</div>
+<div class=meta style="position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:11px">Expansion Map</div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(10,10,10,.18)"></div>"""
+    render(name,1500,80,inner)
 
 def ticker(name,words):
     inner=f"""<div style="position:absolute;left:0;right:0;top:0;height:1px;background:rgba(10,10,10,.25)"></div>
-<div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 4px;font-size:22px;letter-spacing:.3em;text-transform:uppercase;color:#0A0A0A">{''.join(f'<span style="color:{"#D00001" if i==0 else "#0A0A0A"}">{w}</span>' for i,w in enumerate(words))}</div>"""
-    render(name,1500,90,inner)
+<div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 4px;font-size:15px;letter-spacing:.3em;text-transform:uppercase;color:#0A0A0A">{''.join(f'<span style="color:{"#D00001" if i==0 else "#0A0A0A"}">{w}</span>' for i,w in enumerate(words))}</div>"""
+    render(name,1500,50,inner)
 
 cover("capa-map","MAPA","","Expansion Co. · Sistema","Expansion Map","Do modelo à escala, em 4 fases",logo_col=True)
-cover("capa-ct","PÁGINA","CT","Conteúdo","Expansion Funnel","Ideias, roteiros e métricas do seu conteúdo")
-cover("capa-00","PÁGINA","00","Onboarding","Comece aqui","O que é o mapa e como usar")
-cover("capa-fn","PÁGINA","FN","Diagnóstico","Seu funil de expansão","Onde você está e para onde vai",ts=80)
-cover("capa-faq","PÁGINA","?","Suporte","Dúvidas frequentes","Respostas rápidas pras dúvidas comuns",ts=84)
+cover("capa-ct","PÁGINA","CT","Expansion Map · Conteúdo","Expansion Funnel","Ideias, roteiros e métricas do seu conteúdo")
+cover("capa-00","PÁGINA","00","Expansion Map · Onboarding","Comece aqui","O que é o mapa e como usar")
+cover("capa-fn","PÁGINA","FN","Expansion Map · Diagnóstico","Seu funil de expansão","Onde você está e para onde vai",ts=80)
+cover("capa-faq","PÁGINA","?","Expansion Map · Suporte","Dúvidas frequentes","Respostas rápidas pras dúvidas comuns",ts=84)
 for i,t in enumerate(["Modelo & Oferta","Aquisição & Conversão","Vendas & Agendamento","Alavancagem & Mão de Obra"],1):
-    cover(f"capa-f{i}","FASE",f"F{i}",f"Fase {i} de 4",t,"",ts=96 if len(t)<16 else 78 if len(t)<22 else 66)
-cover("capa-r7","PÁGINA","R7","Biblioteca","Recursos de 7 dígitos","Materiais de apoio pra cada fase",ts=80)
+    cover(f"capa-f{i}","FASE",f"F{i}",f"Expansion Map · Fase {i} de 4",t,"",ts=96 if len(t)<16 else 78 if len(t)<22 else 66)
+cover("capa-r7","PÁGINA","R7","Expansion Map · Recursos","Recursos de 7 dígitos","Materiais de apoio pra cada fase",ts=80)
 icon("icone-map","",logo=True)
 for c in ["CT","00","FN","?","F1","F2","F3","F4","R7"]:
     icon("icone-"+{"?":"faq"}.get(c,c.lower()),c)
