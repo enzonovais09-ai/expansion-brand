@@ -3,20 +3,21 @@ from PIL import Image
 CH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 def b64(p): return "data:image/png;base64,"+base64.b64encode(open(p,"rb").read()).decode()
 LB=b64("logo-black.png"); LW=b64("logo-white.png")
-OUT="map2"
+OUT="map3"
 CSS="""*{margin:0;padding:0;box-sizing:border-box}
-body{background:#777;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#0A0A0A}
-.cv{position:relative;overflow:hidden;background:#FFFFFF}
-.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(10,10,10,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(10,10,10,.07) 1px,transparent 1px);background-size:100px 100px;background-position:-1px -1px}
-.bleed{position:absolute;font-weight:700;letter-spacing:-.045em;line-height:.8;color:#0A0A0A;opacity:.05;white-space:nowrap}
-.tick{font-size:15px;letter-spacing:.22em;text-transform:uppercase;color:#D00001;font-weight:500}
-.meta{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#4A4741}"""
-def render(name,w,h,inner,scale=2):
+body{background:transparent;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#0A0A0A}
+.cv{position:relative;overflow:hidden;background:#0A0A0A}
+.cv.clear{background:transparent}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:100px 100px;background-position:-1px -1px}
+.bleed{position:absolute;font-weight:700;letter-spacing:-.045em;line-height:.8;color:#FFFFFF;opacity:.05;white-space:nowrap}
+.tick{font-size:15px;letter-spacing:.22em;text-transform:uppercase;color:#FF2600;font-weight:500}
+.meta{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#CFCAC3}"""
+def render(name,w,h,inner,scale=2,clear=False):
     W=max(w,620); H=max(h,620)
-    html=f"<!doctype html><meta charset=utf-8><style>{CSS}</style><body><div class=cv style='width:{w}px;height:{h}px'>{inner}</div></body>"
+    html=f"<!doctype html><meta charset=utf-8><style>{CSS}</style><body><div class='cv{" clear" if clear else ""}' style='width:{w}px;height:{h}px'>{inner}</div></body>"
     p=os.path.abspath(f"{OUT}/{name}")
     open(p+".html","w").write(html)
-    subprocess.run([CH,"--headless=new","--disable-gpu","--hide-scrollbars",f"--window-size={W},{H}",f"--force-device-scale-factor={scale}","--virtual-time-budget=1200",f"--screenshot={p}.png","file://"+p+".html"],stderr=subprocess.DEVNULL,stdout=subprocess.DEVNULL)
+    subprocess.run([CH,"--headless=new","--disable-gpu","--hide-scrollbars",f"--window-size={W},{H}",f"--force-device-scale-factor={scale}","--default-background-color=00000000","--virtual-time-budget=1200",f"--screenshot={p}.png","file://"+p+".html"],stderr=subprocess.DEVNULL,stdout=subprocess.DEVNULL)
     Image.open(p+".png").crop((0,0,w*scale,h*scale)).save(p+".png",optimize=True)
     os.remove(p+".html")
 
@@ -29,7 +30,7 @@ def cover(name,label,code,tick,title,sub,ts=96,logo_col=False):
   <span style="font-size:11px;letter-spacing:.2em;color:#FFFFFF;font-weight:500">{label}</span>{col}
   <span style="font-size:11px;letter-spacing:.2em;color:#FFFFFF;font-weight:500">EXP©</span></div>
 <div style="position:absolute;left:90px;top:214px;display:flex;align-items:center;gap:16px">
-  <img src="{LB}" style="height:20px"><span style="width:28px;height:1px;background:rgba(10,10,10,.35)"></span><span class=tick style="font-size:13px">{tick}</span></div>
+  <img src="{LW}" style="height:20px"><span style="width:28px;height:1px;background:rgba(255,255,255,.35)"></span><span class=tick style="font-size:13px">{tick}</span></div>
 <div class=meta style="position:absolute;right:262px;top:218px;font-size:11px">© Expansion Co. 2026</div>"""
     render(name,1500,600,inner)
 
@@ -41,17 +42,16 @@ def icon(name,code,logo=False):
 
 def banner(name,n,title,tick):
     # v2: faixa fina (1500x80) pra não dominar a página em largura total
-    inner=f"""<div style="position:absolute;left:0;right:0;top:0;height:2px;background:#0A0A0A"></div>
-<div style="position:absolute;left:0;top:0;bottom:0;width:88px;background:#D00001;display:flex;align-items:center;justify-content:center"><span style="font-size:34px;font-weight:700;letter-spacing:-.03em;color:#FFFFFF">{n}</span></div>
-<div style="position:absolute;left:116px;top:50%;transform:translateY(-50%);font-size:34px;font-weight:700;letter-spacing:-.02em;text-transform:uppercase;line-height:1">{title}</div>
+    inner=f"""<div style="position:absolute;left:0;top:0;bottom:0;width:88px;background:#D00001;display:flex;align-items:center;justify-content:center"><span style="font-size:34px;font-weight:700;letter-spacing:-.03em;color:#FFFFFF">{n}</span></div>
+<div style="position:absolute;left:116px;top:50%;transform:translateY(-50%);font-size:34px;font-weight:700;letter-spacing:-.02em;text-transform:uppercase;line-height:1;color:#FFFFFF">{title}</div>
 <div class=meta style="position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:11px">Expansion Map</div>
-<div style="position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(10,10,10,.18)"></div>"""
+"""
     render(name,1500,80,inner)
 
 def ticker(name,words):
-    inner=f"""<div style="position:absolute;left:0;right:0;top:0;height:1px;background:rgba(10,10,10,.25)"></div>
-<div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 4px;font-size:15px;letter-spacing:.3em;text-transform:uppercase;color:#0A0A0A">{''.join(f'<span style="color:{"#D00001" if i==0 else "#0A0A0A"}">{w}</span>' for i,w in enumerate(words))}</div>"""
-    render(name,1500,50,inner)
+    inner=f"""<div style="position:absolute;left:0;right:0;top:0;height:1px;background:rgba(138,133,128,.45)"></div>
+<div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 4px;font-size:15px;letter-spacing:.3em;text-transform:uppercase;font-weight:500">{''.join(f'<span style="color:{"#FF2600" if i==0 else "#8A8580"}">{w}</span>' for i,w in enumerate(words))}</div>"""
+    render(name,1500,50,inner,clear=True)
 
 cover("capa-map","MAPA","","Expansion Co. · Sistema","Expansion Map","Do modelo à escala, em 4 fases",logo_col=True)
 cover("capa-ct","PÁGINA","CT","Expansion Map · Conteúdo","Expansion Funnel","Ideias, roteiros e métricas do seu conteúdo")
